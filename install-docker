@@ -33,13 +33,15 @@ function printE(){
     exit 1;
 }
 
+# This function check the last command execution. It stop the script if command status isn't 0.
 function checkLastCommandStatus(){
     if [ $? -ne 0 ]; then
-        printE "Something spent wrong. See ./$logFile for more information.";        
+        printE "Something spent wrong. See ./$logFile for more information.";
+        exit 1;       
     fi
 }
 
-# This function run 
+# This function perfoem the installation
 function main(){
     printM "$(now) | Start Docker Installation";
 
@@ -111,4 +113,5 @@ function main(){
     fi
 }
 
+# Run the main funtion
 main;
