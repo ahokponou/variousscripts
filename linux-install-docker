@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# This script perform docker and docker compose installation. 
+# This script perform docker and docker compose installation on linux. 
 # Usage: ./install-docker
 # Auteur: Helmut
 
 # Variables
-logFile="install-docker.log";
+logFile="linux-install-docker.log";
 
 # This function print the actual date and time 
 function now(){
@@ -41,7 +41,7 @@ function checkLastCommandStatus(){
     fi
 }
 
-# This function perfoem the installation
+# This function perform the installation on linux
 function main(){
     printM "$(now) | Start Docker Installation";
 
@@ -57,7 +57,8 @@ function main(){
 
     printM "$(now) | Add Docker’s official GPG key [...]" | tee -a $logFile;
     sudo mkdir -p /etc/apt/keyrings 2>> $logFile;
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>> $logFile;
+	osDistribution=`cat /etc/os-release | grep ^ID= | cut -d = -f2`;
+    curl -fsSL https://download.docker.com/linux/$osDistribution/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>> $logFile;
     checkLastCommandStatus;
     printM "$(now) | Add Docker’s official GPG key [Done]" | tee -a $logFile;
 
