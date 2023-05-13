@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# This script perform zsh installation and configuration
+# Usage: ./configure-zsh
+# Auteur: Helmut
+# Licence: The Unlicensed
+
+logFile="configure-zsh.log";
+
+function now(){
+	echo $(date +%Y-%M-%d---%H:%M:%S);
+	return 0;
+}
+
+function checkLastCommandStatus(){
+	if [ $? -ne 0 ];
+	then
+		echo -e "Something spent wrong. See ./$logFile for more information.";
+		exit 1;
+	fi
+}
+
+function main(){
+	echo -e "$(now) --- ZSH Installation";
+
+	echo -e "$(now) --- Update repository [...]";
+	sudo apt-get update > $logFile 2>&1;
+	checkLastCommandStatus;
+	echo -e "$(now) --- Update repository [Done]";
+
+	echo -e "$(now) --- Install package [...]";
+	sudo apt-get install -y curl zsh >> $logFile 2>&1;
+	checkLastCommandStatus;
+	echo -e "$(now) --- Install package [Done]";
+
+	echo -e "$(now) --- Install Oh My ZSH [...]";
+	cd ~;
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >> $logFile;
+	checkLastCommandStatus;
+	echo -e "$(now) --- Install Oh My ZSH [Done]";
+
+	echo -e "$(now) | ZSH installation ended. See ./$logFile for installation log.";
+}
+
+main;
