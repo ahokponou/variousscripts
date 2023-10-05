@@ -24,5 +24,5 @@ For most of my project, I start from scratch and use docker for development envi
 Usage: 
 
 ```sh
-curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/setup-php-project | bash
+curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/setup-php-project > /usr/local/bin/setup-php-project && chmod +x /usr/local/bin/setup-php-project
 ```
