@@ -15,3 +15,6 @@ Usage :
 ```sh
 curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-install-docker | bash
 ```
+2. Setup vanilla PHP Project
+
+This script setup an empty PHP project
