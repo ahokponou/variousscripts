@@ -6,7 +6,7 @@ Automation scripts for systems or networks.
 
 1. Docker installation
 
-This script perform docker installation on debian
+This script perform docker installation on debian-based distros.
 
 [linux-install-docker](https://github.com/helmutsvd/various-scripts/blob/main/linux-install-docker)
 
@@ -17,4 +17,12 @@ curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-insta
 ```
 2. Setup vanilla PHP Project
 
-This script setup an empty PHP project
+For most of my project, I start from scratch and use docker for development environment. This script setup an empty PHP project to have a base to start.
+
+[setup-php-project](https://github.com/helmutsvd/various-scripts/blob/main/setup-php-project)
+
+Usage: 
+
+```sh
+curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/setup-php-project | bash
+```
