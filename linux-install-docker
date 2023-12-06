@@ -105,7 +105,7 @@ function main(){
     checkLastCommandStatus;
     printM "$(now) | Add your user to the docker group [Done]" | tee -a $logFile;
 
-    printM "$(now) | Your Docker installation ended. See ./$logFile for installation log.";
+    printM "$(now) | Your Docker installation ended. See $logFile for installation log.";
     
     if [ -z $XDG_CURRENT_DESKTOP ]; then
         newgrp docker;
