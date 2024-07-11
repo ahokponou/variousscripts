@@ -8,10 +8,10 @@ Automation scripts for systems or networks.
 
 This script perform docker installation on debian-based distros.
 
-[linux-install-docker](./linux-install-docker)
+[linux-install-docker](./linux-install-docker.bk)
 
 Usage : 
 
 ```sh
-curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-install-docker | bash
+sh -c "curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-install-docker | bash"
 ```
