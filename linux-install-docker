@@ -61,46 +61,46 @@ function printError()
 function dockerInstall()
 {
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [...]";
-  if ! sudo apt-get update >> "$LOGFILE" 2>> "$LOGFILE" ; then
+  if ! sudo bash -c "apt-get update" >> $LOGFILE 2>> $LOGFILE ; then
     printError;
   fi
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install package to allow apt over HTTPS [...]";
-  sudo apt-get install -y ca-certificates curl gnupg lsb-release;
+  sudo bash -c "apt-get install -y ca-certificates curl gnupg lsb-release" >> $LOGFILE 2>> $LOGFILE;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install package to allow apt over HTTPS [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Add Docker’s official GPG key [...]";
-  sudo mkdir -p /etc/apt/keyrings 2>> "$LOGFILE";
-  curl -fsSL https://download.docker.com/linux/"$DIST"/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg;
+  sudo bash -c "mkdir -p /etc/apt/keyrings" 2>> $LOGFILE;
+  curl -fsSL https://download.docker.com/linux/"$DIST"/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg >> $LOGFILE 2>> $LOGFILE;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Add Docker’s official GPG key [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Set up repository [...]";
-  echo "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$DIST $RELEASE $CHANNEL" | sudo tee /etc/apt/sources.list.d/docker.list;
+  echo "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$DIST $RELEASE $CHANNEL" | sudo tee /etc/apt/sources.list.d/docker.list >> $LOGFILE 2>> $LOGFILE;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Set up repository [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [...]";
-  if ! sudo apt-get update >> "$LOGFILE" 2>> "$LOGFILE" ; then
+  if ! sudo bash -c "apt-get update" >> $LOGFILE 2>> $LOGFILE ; then
     printError;
   fi
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install Docker Engine and Docker Compose [...]";
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin;
+  sudo bash -c "apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin" >> $LOGFILE 2>> $LOGFILE;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install Docker Engine and Docker Compose [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Verify that Docker Engine and Docker Compose is installed correctly [...]";
-  sudo docker version;
-  sudo docker compose version;
+  sudo bash -c "docker version" >> $LOGFILE 2>> $LOGFILE;
+  sudo bash -c "docker compose version" >> $LOGFILE 2>> $LOGFILE;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Verify that Docker Engine and Docker Compose is installed correctly [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker after verification [...]";
-  sudo docker system prune -a --force;
+  sudo bash -c "docker system prune -a --force" >> $LOGFILE 2>> $LOGFILE;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker after verification [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Make docker command available to non-root user [...]";
-  sudo groupadd docker;
-  sudo usermod -aG docker "$USER" | sudo sh -c 'cat >> "$LOGFILE"' 2>> "$LOGFILE";
+  sudo bash -c "groupadd docker" >> $LOGFILE 2>> $LOGFILE;
+  sudo bash -c "usermod -aG docker $USER" >> $LOGFILE 2>> $LOGFILE;
   newgrp docker;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Make docker command available to non-root user [DONE]";
 
