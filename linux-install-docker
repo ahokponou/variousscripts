@@ -80,7 +80,7 @@ function dockerInstall()
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Set up repository [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [...]";
-  if ! sudo apt-get update | sudo sh -c 'cat >> "$LOGFILE"' 2>> "$LOGFILE" ; then
+  if ! sudo apt-get update >> "$LOGFILE" 2>> "$LOGFILE" ; then
     printError;
   fi
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [DONE]";
@@ -94,9 +94,9 @@ function dockerInstall()
   sudo docker compose version;
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Verify that Docker Engine and Docker Compose is installed correctly [DONE]";
 
-  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker [...]";
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker after verification [...]";
   sudo docker system prune -a --force;
-  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker [DONE]";
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker after verification [DONE]";
 
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Make docker command available to non-root user [...]";
   sudo groupadd docker;
