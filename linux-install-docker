@@ -61,7 +61,7 @@ function printError()
 function dockerInstall()
 {
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [...]";
-  if ! sudo apt-get update | sudo sh -c 'cat >> "$LOGFILE"' 2>> "$LOGFILE" ; then
+  if ! sudo apt-get update >> "$LOGFILE" 2>> "$LOGFILE" ; then
     printError;
   fi
   echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [DONE]";
