@@ -28,7 +28,7 @@
 #
 
 # VARIABLES
-LOGFILE="/tmp/$(basename "$0").log";
+LOGFILE="/tmp/dockerInstall.log";
 
 # check operating system and return an error if it is not Linux
 function checkOS()
