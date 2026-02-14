@@ -7,13 +7,13 @@ This script allow me to automate some manual commands when I freshly install deb
 Run the postinstall script with sudo
 
 ```bash
-sudo sh -c "curl <URL> | bash"
+sudo sh -c "curl https://raw.githubusercontent.com/ahokponou/variousscripts/refs/heads/main/postinstall.sh | bash"
 ```
 
 Run the postinstall script as root
 
 ```bash
-su - root -c "curl <URL> | bash"
+su - root -c "curl https://raw.githubusercontent.com/ahokponou/variousscripts/refs/heads/main/postinstall.sh | bash"
 ```
 
 Install ohmyzsh
