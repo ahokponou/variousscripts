@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-SCRIPT_DIR=$(dirname "$0")
-
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <cert_name> <ca_name>"
     exit 1
@@ -11,11 +9,16 @@ fi
 cert_name="$1"
 ca_name="$2"
 
-CA_DIR="$SCRIPT_DIR/$ca_name"
+CA_DIR="/opt/$ca_name"
 PRIVATE_DIR="$CA_DIR/private"
 CSR_DIR="$CA_DIR/csr"
 CNF_DIR="$CA_DIR/cnf"
 CERTS_DIR="$CA_DIR/certs"
+
+if [ ! -d "$CA_DIR" ];then
+  echo "$ca_name doesn't exist. Exiting..."
+  exit 1
+fi
 
 ca_key="$PRIVATE_DIR/$ca_name.key"
 ca_cert="$CERTS_DIR/$ca_name.pem"
@@ -30,11 +33,18 @@ fi
 
 echo "Signing certificate with CA..."
 openssl_cnf="$CNF_DIR/$cert_name.cnf"
+ca_passphrase="$PRIVATE_DIR/passphrase.txt"
 
-openssl x509 -req -in "$cert_csr" \
+if ! openssl x509 -req -in "$cert_csr" \
     -CA "$ca_cert" -CAkey "$ca_key" -CAcreateserial \
+    -passin file:"$ca_passphrase" \
     -out "$cert_crt" -days 825 -sha256 \
-    -extfile "$openssl_cnf" -extensions req_ext
+    -extfile "$openssl_cnf" -extensions req_ext;then
+        echo "Cannot sign certificate. Exiting..."
+        exit 1
+fi
 
 clear
-echo "Certificate issued: $cert_crt"
+echo "Certificate sucessfully issued"
+echo "Cert: $cert_crt"
+echo "Key: $PRIVATE_DIR/$cert_name.key"

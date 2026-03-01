@@ -8,7 +8,7 @@ else
     read -p "Enter Certificate Authority (CA) name: " ca_name
 fi
 
-CA_DIR="$SCRIPT_DIR/$ca_name"
+CA_DIR="/opt/$ca_name"
 PRIVATE_DIR="$CA_DIR/private"
 CSR_DIR="$CA_DIR/csr"
 CERTS_DIR="$CA_DIR/certs"
@@ -25,11 +25,7 @@ if [ ! -f "$CA_CERT" ]; then
     exit 1
 fi
 
-clear
-echo "Adding the Root Certificate to Linux..."
-sudo cp "$CA_CERT" "/usr/local/share/ca-certificates/$ca_name.crt"
-sudo update-ca-certificates
-echo "Adding the Root Certificate to Linux [done]"
+# Detect OS
+# Install $ca_name
 
-clear
 echo "🎉 Congratulations, your CA certificate is installed."
