@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-SCRIPT_DIR=$(dirname "$0")
-
 if [ $# -lt 1 ]; then
     read -p "Enter certificate name (CN): " cert_name
 else
@@ -15,9 +13,15 @@ else
     ca_name="$2"
 fi
 
+CA_DIR="/opt/$ca_name"
+
+if [ ! -d "$CA_DIR" ];then
+  echo "$ca_name doesn't exist. Exiting..."
+  exit 1
+fi
+
 read -p "Enter comma-separated SANs (e.g. DNS:example.com,DNS:www.example.com,IP:127.0.0.1): " san_input
 
-CA_DIR="$SCRIPT_DIR/$ca_name"
 PRIVATE_DIR="$CA_DIR/private"
 CSR_DIR="$CA_DIR/csr"
 CNF_DIR="$CA_DIR/cnf"
@@ -43,7 +47,10 @@ EOF
 
 clear
 echo "Generating key and CSR with SAN..."
-openssl req -new -nodes -keyout "$cert_key" -out "$cert_csr" -config "$openssl_cnf"
+if ! openssl req -new -nodes -keyout "$cert_key" -out "$cert_csr" -config "$openssl_cnf";then
+    echo "Cannot generate "
+    exit 1
+fi
 
 clear
 echo "CSR: $cert_csr"
