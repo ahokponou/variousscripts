@@ -1,118 +1,119 @@
 #!/bin/bash
+# linux-install-docker
+#
+# Perform docker and docker compose installation on debian-based linux distribution
+#
+# @package ahokponou\variousscripts\linux-install-docker
+# @version 1.0.0
+# @author Helmut
+# @license MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 
-# This script perform docker and docker compose installation on linux. 
-# Usage: ./linux-install-docker
-# Auteur: Helmut
+# VARIABLES
+LOGFILE="/tmp/$(basename "$0").log";
 
-# Variables
-logFile="/tmp/linux-install-docker.log";
-
-# This function print the actual date and time 
-function now(){
-    echo $(date +%Y-%M-%d---%H:%M:%S);
-    return 0;
-}
-
-# This function print a message given in parameter
-function printM(){
-    if [ $# -eq 0 ]; then
-        echo -e "This function require an argument. Usage: $FUNCNAME \"Your message here\"";
-        exit 1;
+# check operating system and return an error if it is not Linux
+function checkOS()
+{
+  if [[ $(uname) != "Linux" ]]; then
+    if [[ $(uname) == "Darwin" ]]; then
+      echo "$(date '+%Y-%M-%d %H:%M:%S') | Our script does not support the installation of Docker on your current operating system ($(sw_vers -productName) $(sw_vers -productVersion)). Please refer to https://docs.docker.com/ for manual installation.";
     else
-        echo -e $1;
-    fi
-}
-
-# This function print an error given in parameter
-function printE(){
-    if [ $# -eq 0 ]; then
-        echo -e "This function require an argument. Usage: $0 'Your text here'";
-    else
-        echo -e $1;
+      echo "$(date '+%Y-%M-%d %H:%M:%S') | Our script does not support the installation of Docker on your current operating system. Please refer to https://docs.docker.com/ for manual installation.";
     fi
     exit 1;
+  fi
 }
 
-# This function check the last command execution. It stop the script if command status isn't 0.
-function checkLastCommandStatus(){
-    if [ $? -ne 0 ]; then
-        printE "Something spent wrong. See ./$logFile for more information.";
-        exit 1;
-    fi
+# GATHER OPERATING SYSTEM INFORMATION
+function getOSInfo()
+{
+  ARCH=$(uname -m 2>> "$LOGFILE");
+  DIST=$(awk -F= '/^ID=/{gsub(/"/, "", $2); print $2}' /etc/os-release 2>> "$LOGFILE");
+  RELEASE=$(lsb_release -cs 2>> "$LOGFILE");
+  CHANNEL="stable";
 }
 
-# This function perform the installation on linux
-function main(){
-    printM "$(now) | Start Docker Installation";
-
-    printM "$(now) | Update repository [...]" | tee -a $logFile;
-    sudo apt-get update >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Update repository [Done]" | tee -a $logFile;
-
-    printM "$(now) | Install package to allow apt over HTTPS [...]" | tee -a $logFile;
-    sudo apt-get install -y ca-certificates curl gnupg lsb-release >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Install package to allow apt over HTTPS [Done]" | tee -a $logFile;
-
-    printM "$(now) | Add Docker’s official GPG key [...]" | tee -a $logFile;
-    sudo mkdir -p /etc/apt/keyrings 2>> $logFile;
-	osDistribution=`cat /etc/os-release | grep ^ID= | cut -d = -f2`;
-    curl -fsSL https://download.docker.com/linux/$osDistribution/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>> $logFile;
-    checkLastCommandStatus;
-    printM "$(now) | Add Docker’s official GPG key [Done]" | tee -a $logFile;
-
-    printM "$(now) | Set up repository [...]" | tee -a $logFile;
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$osDistribution $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>> $logFile;
-    printM "$(now) | Set up repository [Done]" | tee -a $logFile;
-
-    printM "$(now) | Update repository [...]" | tee -a $logFile;
-    sudo apt-get update >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Update repository [Done]" | tee -a $logFile;
-
-    printM "$(now) | Install Docker Engine [...]" | tee -a $logFile;
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Install Docker Engine [Done]" | tee -a $logFile;
-
-    printM "$(now) | Verify that Docker Engine is installed correctly [...]" | tee -a $logFile;
-    sudo docker run hello-world >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Verify that Docker Engine is installed correctly [Done]" | tee -a $logFile;
-
-    printM "$(now) | Update repository [...]" | tee -a $logFile;
-    sudo apt-get update >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Update repository [Done]" | tee -a $logFile;
-
-    printM "$(now) | Install Docker Compose [...]" | tee -a $logFile;
-    sudo apt-get install -y docker-compose-plugin >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Install Docker Compose [Done]" | tee -a $logFile;
-
-    printM "$(now) | Verify that Docker Compose is installed correctly [...]" | tee -a $logFile;
-    sudo docker compose version >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Verify that Docker Compose is installed correctly [Done]" | tee -a $logFile;
-
-    printM "$(now) | Create the docker group [...]" | tee -a $logFile;
-    sudo groupadd docker >> $logFile 2>&1;
-    printM "$(now) | Create the docker group [Done]" | tee -a $logFile;
-
-    printM "$(now) | Add your user to the docker group [...]" | tee -a $logFile;
-    sudo usermod -aG docker $USER >> $logFile 2>&1;
-    checkLastCommandStatus;
-    printM "$(now) | Add your user to the docker group [Done]" | tee -a $logFile;
-
-    printM "$(now) | Your Docker installation ended. See $logFile for installation log.";
-    
-    if [ -z $XDG_CURRENT_DESKTOP ]; then
-        newgrp docker;
-    else
-        printM "Info: Log out and log back in so that your group membership is re-evaluated. If testing on a virtual machine, it may be necessary to restart the virtual machine for changes to take effect. On a desktop Linux environment such as X Windows, log out of your session completely and then log back in.";
-    fi
+function printError()
+{
+  echo -e "Something spent wrong. See $LOGFILE for more information.";
+  exit 1;
 }
 
-# Run the main funtion
+function dockerInstall()
+{
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [...]";
+  if ! sudo apt-get update | sudo sh -c 'cat >> "$LOGFILE"' 2>> "$LOGFILE" ; then
+    printError;
+  fi
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install package to allow apt over HTTPS [...]";
+  sudo apt-get install -y ca-certificates curl gnupg lsb-release;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install package to allow apt over HTTPS [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Add Docker’s official GPG key [...]";
+  sudo mkdir -p /etc/apt/keyrings 2>> "$LOGFILE";
+  curl -fsSL https://download.docker.com/linux/"$DIST"/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Add Docker’s official GPG key [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Set up repository [...]";
+  echo "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$DIST $RELEASE $CHANNEL" | sudo tee /etc/apt/sources.list.d/docker.list;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Set up repository [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [...]";
+  if ! sudo apt-get update | sudo sh -c 'cat >> "$LOGFILE"' 2>> "$LOGFILE" ; then
+    printError;
+  fi
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Update repository [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install Docker Engine and Docker Compose [...]";
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Install Docker Engine and Docker Compose [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Verify that Docker Engine and Docker Compose is installed correctly [...]";
+  sudo docker version;
+  sudo docker compose version;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Verify that Docker Engine and Docker Compose is installed correctly [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker [...]";
+  sudo docker system prune -a --force;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Clean up docker [DONE]";
+
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Make docker command available to non-root user [...]";
+  sudo groupadd docker;
+  sudo usermod -aG docker "$USER" | sudo sh -c 'cat >> "$LOGFILE"' 2>> "$LOGFILE";
+  newgrp docker;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Make docker command available to non-root user [DONE]";
+
+  echo -e "Info: Log out and log in back so that your group membership is re-evaluated. If testing on a virtual machine, it may be necessary to restart the virtual machine for changes to take effect.";
+}
+
+function main()
+{
+  checkOS;
+  getOSInfo;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Docker Installation [BEGIN]";
+  dockerInstall;
+  echo -e "$(date '+%Y-%M-%d %H:%M:%S') | Docker Installation [ENDED]\nSee $LOGFILE for complete installation log.";
+}
+
 main;
