@@ -2,7 +2,7 @@
 
 read -p "Please enter the user you want to add as sudoers: " USERNAME
 
-LOG_FILE="/tmp/$(date '+%Y-%m-%d_%H-%M-%S')_postinstall.log"
+LOG_FILE="./$(date '+%Y-%m-%d_%H-%M-%S')_postinstall.log"
 touch "$LOG_FILE"
 
 function log_and_echo() {
@@ -12,8 +12,6 @@ function log_and_echo() {
 function log() {
 	echo -e "$(date '+%Y-%m-%d %H:%M') - $1" >> "$LOG_FILE"
 }
-
-LOG_FILE="/tmp/$(date '+%Y-%m-%d_%H-%M-%S')_postinstall.log"
 
 log_and_echo "postinstall starting..."
 
