@@ -1,4 +1,6 @@
-# Postinstall
+# Collection of scripts
+
+## Postinstall
 
 This script allow me to automate some manual commands when I freshly install debian :)
 
@@ -21,3 +23,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="minimal"/' $HOME/.zshrc
 ```
 
+## CA Helper Scripts
+
+- [Be your own CA](./privateCA)
