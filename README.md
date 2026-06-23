@@ -4,16 +4,16 @@
 
 This script allow me to automate some manual commands when I freshly install debian :)
 
-Run the postinstall script with sudo
+Download the postinstall script and make it executable
 
 ```bash
-sudo sh -c "curl https://raw.githubusercontent.com/ahokponou/variousscripts/refs/heads/main/postinstall.sh | bash"
+wget -O postinstall.sh https://raw.githubusercontent.com/ahokponou/variousscripts/refs/heads/main/postinstall.sh && chmod +x postinstall.sh
 ```
 
 Run the postinstall script as root
 
 ```bash
-su - root -c "curl https://raw.githubusercontent.com/ahokponou/variousscripts/refs/heads/main/postinstall.sh | bash"
+su - root -c "$HOME/postinstall.sh | bash"
 ```
 
 Install ohmyzsh
