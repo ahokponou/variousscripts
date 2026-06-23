@@ -2,6 +2,7 @@
 
 # This script perform portainer-ce installation. 
 # Portainer Community Edition is a lightweight service delivery platform for containerized applications that can be used to manage Docker, Swarm environments.
+# Requirement: Docker must be installed and run properly
 # Usage: ./install-portainer
 # Auteur: Helmut
 
