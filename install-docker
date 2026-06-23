@@ -41,67 +41,73 @@ function checkLastCommandStatus(){
 
 # This function run 
 function main(){
-    if [ $EUID -ne 0 ]; then
-        printE "This script must be run as root. Usage: sudo $0";
+    printM "$(now) | Start Docker Installation";
+
+    printM "$(now) | Update repository [...]" | tee -a $logFile;
+    sudo apt-get update >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Update repository [Done]" | tee -a $logFile;
+
+    printM "$(now) | Install package to allow apt over HTTPS [...]" | tee -a $logFile;
+    sudo apt-get install -y ca-certificates curl gnupg lsb-release >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Install package to allow apt over HTTPS [Done]" | tee -a $logFile;
+
+    printM "$(now) | Add Docker’s official GPG key [...]" | tee -a $logFile;
+    sudo mkdir -p /etc/apt/keyrings 2>> $logFile;
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>> $logFile;
+    checkLastCommandStatus;
+    printM "$(now) | Add Docker’s official GPG key [Done]" | tee -a $logFile;
+
+    printM "$(now) | Set up repository [...]" | tee -a $logFile;
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>> $logFile;
+    printM "$(now) | Set up repository [Done]" | tee -a $logFile;
+
+    printM "$(now) | Update repository [...]" | tee -a $logFile;
+    sudo apt-get update >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Update repository [Done]" | tee -a $logFile;
+
+    printM "$(now) | Install Docker Engine [...]" | tee -a $logFile;
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Install Docker Engine [Done]" | tee -a $logFile;
+
+    printM "$(now) | Verify that Docker Engine is installed correctly [...]" | tee -a $logFile;
+    sudo docker run hello-world >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Verify that Docker Engine is installed correctly [Done]" | tee -a $logFile;
+
+    printM "$(now) | Update repository [...]" | tee -a $logFile;
+    sudo apt-get update >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Update repository [Done]" | tee -a $logFile;
+
+    printM "$(now) | Install Docker Compose [...]" | tee -a $logFile;
+    sudo apt-get install -y docker-compose-plugin >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Install Docker Compose [Done]" | tee -a $logFile;
+
+    printM "$(now) | Verify that Docker Compose is installed correctly [...]" | tee -a $logFile;
+    sudo docker compose version >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Verify that Docker Compose is installed correctly [Done]" | tee -a $logFile;
+
+    printM "$(now) | Create the docker group [...]" | tee -a $logFile;
+    sudo groupadd docker >> $logFile 2>&1;
+    printM "$(now) | Create the docker group [Done]" | tee -a $logFile;
+
+    printM "$(now) | Add your user to the docker group [...]" | tee -a $logFile;
+    sudo usermod -aG docker $USER >> $logFile 2>&1;
+    checkLastCommandStatus;
+    printM "$(now) | Add your user to the docker group [Done]" | tee -a $logFile;
+
+    printM "$(now) | Your Docker installation ended. See ./$logFile for installation log.";
+    
+    if [ -z $XDG_CURRENT_DESKTOP ]; then
+        newgrp docker;
     else
-        printM "$(now) | Start Docker Installation";
-
-        printM "$(now) | Uninstall old Docker Version [...]" | tee $logFile;
-        apt-get remove -y docker docker-engine docker.io containerd runc >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Uninstall old Docker Version [Done]" | tee -a $logFile;
-
-        printM "$(now) | Update repository [...]" | tee -a $logFile;
-        apt-get update >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Update repository [Done]" | tee -a $logFile;
-
-        printM "$(now) | Install package to allow apt over HTTPS [...]" | tee -a $logFile;
-        apt-get install -y ca-certificates curl gnupg lsb-release >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Install package to allow apt over HTTPS [Done]" | tee -a $logFile;
-
-        printM "$(now) | Add Docker’s official GPG key [...]" | tee -a $logFile;
-        mkdir -p /etc/apt/keyrings 2>> $logFile;
-        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>> $logFile;
-        checkLastCommandStatus;
-        printM "$(now) | Add Docker’s official GPG key [Done]" | tee -a $logFile;
-
-        printM "$(now) | Set up repository [...]" | tee -a $logFile;
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null 2>> $logFile;
-        printM "$(now) | Set up repository [Done]" | tee -a $logFile;
-
-        printM "$(now) | Update repository [...]" | tee -a $logFile;
-        apt-get update >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Update repository [Done]" | tee -a $logFile;
-
-        printM "$(now) | Install Docker Engine [...]" | tee -a $logFile;
-        apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Install Docker Engine [Done]" | tee -a $logFile;
-
-        printM "$(now) | Verify that Docker Engine is installed correctly [...]" | tee -a $logFile;
-        docker run hello-world >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Verify that Docker Engine is installed correctly [Done]" | tee -a $logFile;
-
-        printM "$(now) | Update repository [...]" | tee -a $logFile;
-        apt-get update >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Update repository [Done]" | tee -a $logFile;
-
-        printM "$(now) | Install Docker Compose [...]" | tee -a $logFile;
-        apt-get install -y docker-compose-plugin >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Install Docker Compose [Done]" | tee -a $logFile;
-
-        printM "$(now) | Verify that Docker Compose is installed correctly [...]" | tee -a $logFile;
-        docker compose version >> $logFile 2>&1;
-        checkLastCommandStatus;
-        printM "$(now) | Verify that Docker Compose is installed correctly [Done]" | tee -a $logFile;
-
-        printM "$(now) | Your Docker installation ended. See ./$logFile for installation log.";
+        printM "Info: Log out and log back in so that your group membership is re-evaluated. If testing on a virtual machine, it may be necessary to restart the virtual machine for changes to take effect. On a desktop Linux environment such as X Windows, log out of your session completely and then log back in.";
     fi
 }
 
