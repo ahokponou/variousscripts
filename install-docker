@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# This script perform docker and docker compose installation. 
+# Usage: ./install-docker
+# Auteur: Helmut
+
+# Variables
+logFile="install-docker.log";
+
+# This function print the actual date and time 
+function now(){
+    echo $(date +%Y-%M-%d---%H:%M:%S);
+    return 0;
+}
+
+# This function print a message given in parameter
+function printM(){
+    if [ $# -eq 0 ]; then
+        echo -e "This function require an argument. Usage: $FUNCNAME \"Your message here\"";
+        exit 1;
+    else
+        echo -e $1;
+    fi
+}
+
+# This function print an error given in parameter
+function printE(){
+    if [ $# -eq 0 ]; then
+        echo -e "This function require an argument. Usage: $0 'Your text here'";
+    else
+        echo -e $1;
+    fi
+    exit 1;
+}
+
+function checkLastCommandStatus(){
+    if [ $? -ne 0 ]; then
+        printE "Something spent wrong. See ./$logFile for more information.";        
+    fi
+}
+
+# This function run 
+function main(){
+    if [ $EUID -ne 0 ]; then
+        printE "This script must be run as root. Usage: sudo $0";
+    else
+        printM "$(now) | Start Docker Installation";
+
+        printM "$(now) | Uninstall old Docker Version [...]" | tee $logFile;
+        apt-get remove -y docker docker-engine docker.io containerd runc >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Uninstall old Docker Version [Done]" | tee -a $logFile;
+
+        printM "$(now) | Update repository [...]" | tee -a $logFile;
+        apt-get update >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Update repository [Done]" | tee -a $logFile;
+
+        printM "$(now) | Install package to allow apt over HTTPS [...]" | tee -a $logFile;
+        apt-get install -y ca-certificates curl gnupg lsb-release >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Install package to allow apt over HTTPS [Done]" | tee -a $logFile;
+
+        printM "$(now) | Add Docker’s official GPG key [...]" | tee -a $logFile;
+        mkdir -p /etc/apt/keyrings 2>> $logFile;
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg 2>> $logFile;
+        checkLastCommandStatus;
+        printM "$(now) | Add Docker’s official GPG key [Done]" | tee -a $logFile;
+
+        printM "$(now) | Set up repository [...]" | tee -a $logFile;
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null 2>> $logFile;
+        printM "$(now) | Set up repository [Done]" | tee -a $logFile;
+
+        printM "$(now) | Update repository [...]" | tee -a $logFile;
+        apt-get update >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Update repository [Done]" | tee -a $logFile;
+
+        printM "$(now) | Install Docker Engine [...]" | tee -a $logFile;
+        apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Install Docker Engine [Done]" | tee -a $logFile;
+
+        printM "$(now) | Verify that Docker Engine is installed correctly [...]" | tee -a $logFile;
+        docker run hello-world >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Verify that Docker Engine is installed correctly [Done]" | tee -a $logFile;
+
+        printM "$(now) | Update repository [...]" | tee -a $logFile;
+        apt-get update >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Update repository [Done]" | tee -a $logFile;
+
+        printM "$(now) | Install Docker Compose [...]" | tee -a $logFile;
+        apt-get install -y docker-compose-plugin >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Install Docker Compose [Done]" | tee -a $logFile;
+
+        printM "$(now) | Verify that Docker Compose is installed correctly [...]" | tee -a $logFile;
+        docker compose version >> $logFile 2>&1;
+        checkLastCommandStatus;
+        printM "$(now) | Verify that Docker Compose is installed correctly [Done]" | tee -a $logFile;
+
+        printM "$(now) | Your Docker installation ended. See ./$logFile for installation log.";
+    fi
+}
+
+main;
