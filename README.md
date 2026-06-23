@@ -13,5 +13,5 @@ This script perform docker installation on debian-based distros.
 Usage : 
 
 ```sh
-sh -c "curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-install-docker | bash"
+curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-install-docker | bash
 ```
