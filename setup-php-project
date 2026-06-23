@@ -8,7 +8,7 @@
 # Author: Helmut
 
 function createDockerfile(){
-    cat << EOF > "$1/Dockerfile" 
+    echo " 
 FROM php:8.2-apache-bookworm
 
 COPY ./ /var/www/html/
@@ -34,18 +34,32 @@ RUN rm /etc/apache2/sites-available/default-ssl.conf
 EXPOSE 80
 EXPOSE 443
 
-CMD [\"apache2-foreground\"]
-EOF;
+CMD [\"apache2-foreground\"]" > $1/Dockerfile;
 }
 
 function createDockerCompose(){
-    cat << EOF > "$1/docker-compose.yml" 
-version: '3'\n\nservices:\n  app:\n    build:\n      context: .\n      dockerfile: Dockerfile\n    container_name: app\n    hostname: app\n    volumes:\n      - ./:/var/www/html\n    networks:\n      - net-app\n    ports:\n    - 8880:80\n    - 8443:443\n\nnetworks:\n  net-app:\n    name: net-app
-EOF;
+    echo "version: '3'
+    services:
+        app:
+            build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: app
+        hostname: app
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - net-app
+        ports:
+            - 8880:80
+            - 8443:443
+    networks:
+        net-app:
+            name: net-app" > $1/docker-compose.yml;
 }
 
 function createApacheConfFile(){
-    cat << EOF > "$1/000-default.conf"
+    echo "
 <VirtualHost *:80>
     ServerName localhost
     ServerAdmin webmaster@localhost
@@ -82,8 +96,7 @@ function createApacheConfFile(){
     <Directory /usr/lib/cgi-bin>
         SSLOptions +StdEnvVars
     </Directory>
-</VirtualHost>
-EOF;
+</VirtualHost>" > $1/000-default.conf;
 }
 
 function initDocker(){
@@ -112,10 +125,24 @@ function initProject(){
         exit 1;
     fi
     mkdir -p $1/app $1/public;
-    echo -e "<?php\necho \"Your project start here. :)\";" > $1/app/app.php;
-    echo -e "<?php\nrequire(dirname(__DIR__) . \"/app/app.php\");" > $1/public/index.php;
-    echo -e "User-Agent: *\nDisallow: /cgi-bin/\nDisallow: /assets/" > $1/public/robots.txt;
-    echo -e "Options +FollowSymlinks\n\nRewriteEngine On\n\n# # Redirect www to non-www\n# RewriteCond %{HTTP_HOST} ^www\.example\.com [NC]\n# RewriteRule ^(.*)$ http://example.com/$1 [L,R=301]\n\n# Redirect http to https\nRewriteCond %{HTTPS} off\nRewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]\n\n# Rewrite URLs to index.php\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*) index.php [L]" > $1/public/.htaccess;
+    echo -e "<?php
+echo \"Your project start here. :)\";" > $1/app/app.php;
+    echo -e "<?php
+require(dirname(__DIR__) . \"/app/app.php\");" > $1/public/index.php;
+    echo -e "User-Agent: *
+Disallow: /cgi-bin/
+Disallow: /assets/" > $1/public/robots.txt;
+    echo -e "Options +FollowSymlinks
+RewriteEngine On
+# # Redirect www to non-www
+# RewriteCond %{HTTP_HOST} ^www\.example\.com [NC]
+# RewriteRule ^(.*)$ http://example.com/$1 [L,R=301]
+# Redirect http to https\nRewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Rewrite URLs to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*) index.php [L]" > $1/public/.htaccess;
 }
 
 function main(){
