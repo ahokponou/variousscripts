@@ -13,7 +13,7 @@ wget -O postinstall.sh https://raw.githubusercontent.com/ahokponou/variousscript
 Run the postinstall script as root
 
 ```bash
-su - root -c "$HOME/postinstall.sh | bash"
+su - root -c "$HOME/postinstall.sh"
 ```
 
 Install ohmyzsh
