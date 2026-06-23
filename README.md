@@ -15,3 +15,6 @@ Usage :
 ```sh
 curl https://raw.githubusercontent.com/ahokponou/variousscripts/main/linux-install-docker | bash
 ```
+## Instructions
+
+1. [Server configuration](./server-conf.md)
