@@ -5,7 +5,7 @@
 # Auteur: Helmut
 
 # Variables
-logFile="linux-install-docker.log";
+logFile="/tmp/linux-install-docker.log";
 
 # This function print the actual date and time 
 function now(){
