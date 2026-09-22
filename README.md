@@ -7,7 +7,7 @@ This script allow me to automate some manual commands when I freshly install deb
 Download the postinstall script and make it executable
 
 ```bash
-wget -O postinstall.sh https://raw.githubusercontent.com/ahokponou/variousscripts/refs/heads/main/postinstall.sh && chmod +x postinstall.sh
+wget -O postinstall.sh https://git.olade.group/ahokponou/variousscripts/raw/branch/main/postinstall.sh && chmod +x postinstall.sh
 ```
 
 Run the postinstall script as root
